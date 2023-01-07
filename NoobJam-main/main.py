@@ -173,7 +173,6 @@ class Button():
         self.image = image
         self.x_pos = position[0]
         self.y_pos = position[1]
-        #self.ont = font
         self.base_color, self.hovering_color = base_color, hovering_color
         self.text_input = text_input
         self.text = main_font.render(self.text_input, True, self.base_color)
@@ -317,6 +316,7 @@ def gameMenu():
     Final_Coin_Y = coin_img_Y
 
     while running:
+        SCREEN.fill("black")
         print(nmbToCo_ladder(12))
         SCREEN.fill((195, 115, 42))
         draw_board(board_img_X, board_img_Y, board_img)
@@ -553,10 +553,45 @@ def gameMenu():
         pygame.display.update()
 
 
+def howToPlay():
+    font = pygame.font.SysFont("monospace",30)
+    message = "boss nayem"
+    while True:
+        SCREEN.fill("black")
+        SCREEN.blit(BG, (0, 0))
+        MENU_MOUSE_POS = pygame.mouse.get_pos()
+        SCREEN.blit(BG, (0, 0))
+        text = font.render(message,True, (255, 255, 255))
+
+        # Get the rect of the text surface
+        text_rect = text.get_rect()
+
+        # Set the position of the rect
+        # text_rect.centerx = SCREEN.get_rect().centerx
+        # text_rect.centery = SCREEN.get_rect().centery
+
+        # Blit the text surface onto the screen
+        SCREEN.blit(text, (500,300))
+        Back_Button = Button(image=pygame.image.load("start.png"), position=(640, 250),
+                             text_input="PLAY", base_color="#d7fcd4", hovering_color="Green")
+        Back_Button.changeColor(MENU_MOUSE_POS)
+        Back_Button.update()
+
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                pygame.quit()
+                sys.exit()
+            if event.type == pygame.MOUSEBUTTONDOWN:
+                if Back_Button.checkForInput(MENU_MOUSE_POS):
+                    return
+
+        pygame.display.update()
+
+
 def main_menu():
     while True:
+        SCREEN.fill("black")
         SCREEN.blit(BG, (0, 0))
-
         MENU_MOUSE_POS = pygame.mouse.get_pos()
 
         # MENU_TEXT = get_font(100).render("MAIN MENU", True, "#b68f40")
@@ -565,7 +600,7 @@ def main_menu():
         PLAY_BUTTON = Button(image=pygame.image.load("start.png"), position=(640, 250),
                              text_input="PLAY", base_color="#d7fcd4", hovering_color="Green")
         OPTIONS_BUTTON = Button(image=pygame.image.load("start.png"), position=(640, 400),
-                                text_input="OPTIONS",base_color="#d7fcd4", hovering_color="Green")
+                                text_input="OPTIONS", base_color="#d7fcd4", hovering_color="Green")
         QUIT_BUTTON = Button(image=pygame.image.load("start.png"), position=(640, 550),
                              text_input="QUIT", base_color="#d7fcd4", hovering_color="Green")
 
@@ -582,8 +617,8 @@ def main_menu():
             if event.type == pygame.MOUSEBUTTONDOWN:
                 if PLAY_BUTTON.checkForInput(MENU_MOUSE_POS):
                     gameMenu()
-                # if OPTIONS_BUTTON.checkForInput(MENU_MOUSE_POS):
-                #     options()
+                if OPTIONS_BUTTON.checkForInput(MENU_MOUSE_POS):
+                    howToPlay()
                 if QUIT_BUTTON.checkForInput(MENU_MOUSE_POS):
                     pygame.quit()
                     sys.exit()
