@@ -227,6 +227,10 @@ def draw_dice(diceImg, player_score):
     SCREEN.blit(diceImg[player_score - 1], (800, 150))
 
 
+def draw_roller(diceImg):
+    SCREEN.blit(diceImg[1], (800, 230))
+
+
 def draw_coin(x, y, coin_img):
     SCREEN.blit(coin_img, (x, y))
 
@@ -314,6 +318,16 @@ def gameMenu():
     lifeImg.append(pygame.image.load("life.png"))
     global Final_Coin_Y
     Final_Coin_Y = coin_img_Y
+
+    # gameoverFlag = False
+
+    def diceRolling(position, rect):
+        if position[0] in range(rect.left, rect.right) and position[1] in range(rect.top,
+                                                                                rect.bottom):
+            if pygame.mouse.get_pressed()[0] == 1:
+                print("Button Press!")
+                return True
+        return False
 
     while running:
         SCREEN.fill("black")
@@ -525,6 +539,7 @@ def gameMenu():
                             draw_ladder(ladder_image_X, ladder_image_Y, ladder_image)
 
                 dice_checking = 0
+            dice_rolling = diceRolling(pygame.mouse.get_pos(), pygame.Rect(800, 230, 80, 80.32))
 
             # Dice Rolling
             if dice_rolling:
@@ -542,6 +557,7 @@ def gameMenu():
                 destination = player_score + player_position
 
             draw_dice(diceImg, player_score)
+            draw_roller(diceImg)
             draw_coin(coin_img_X, coin_img_Y, coin_img)
             coin_Stable(coin_img_X, coin_img_Y)
 
@@ -554,24 +570,26 @@ def gameMenu():
 
 
 def howToPlay():
-    font = pygame.font.SysFont("monospace",30)
-    message = "boss nayem"
+    font = pygame.font.SysFont("monospace", 30)
+    lines = ["Line 1", "Line 2", "Line 3"]
+
+    # Set the vertical spacing between lines
+    line_spacing = 5
+
+    # Set the starting position for the first line
+    x = 50
+    y = 50
     while True:
         SCREEN.fill("black")
         SCREEN.blit(BG, (0, 0))
         MENU_MOUSE_POS = pygame.mouse.get_pos()
         SCREEN.blit(BG, (0, 0))
-        text = font.render(message,True, (255, 255, 255))
-
-        # Get the rect of the text surface
-        text_rect = text.get_rect()
-
-        # Set the position of the rect
-        # text_rect.centerx = SCREEN.get_rect().centerx
-        # text_rect.centery = SCREEN.get_rect().centery
-
-        # Blit the text surface onto the screen
-        SCREEN.blit(text, (500,300))
+        for line in lines:
+            text = font.render(line, True, (255, 255, 255), (0, 0, 0))
+            text_rect = text.get_rect()
+            text_rect.topleft = (x, y)
+            y += text_rect.height + line_spacing
+            SCREEN.blit(text, text_rect)
         Back_Button = Button(image=pygame.image.load("start.png"), position=(640, 250),
                              text_input="PLAY", base_color="#d7fcd4", hovering_color="Green")
         Back_Button.changeColor(MENU_MOUSE_POS)
