@@ -1,13 +1,20 @@
 import random
+import sys
 import time
 
 import pygame
+from matplotlib.font_manager import get_font
 
 pygame.init()
 
 SCREEN = pygame.display.set_mode((1000, 600))
 
-Final_Coin_Y=0
+Final_Coin_Y = 0
+Final_Coin_X = 0
+
+main_font = pygame.font.SysFont("cambria", 30)
+BG = pygame.image.load("Background.png")
+BG = pygame.transform.scale(BG, (1000, 600))
 
 
 def corOrdinateToNmb(x, y):
@@ -161,74 +168,78 @@ def nmbToCordinate_green(nmb):
 # ludu board
 
 
-# class Button():
-#     def __init__(self, image, x_pos, y_pos, text_input):
-#         self.image = image
-#         self.x_pos = x_pos
-#         self.y_pos = y_pos
-#         self.rect = self.image.get_rect(center=(self.x_pos, self.y_pos))
-#         self.text_input = text_input
-#         self.text = main_font.render(self.text_input, True, "white")
-#         self.text_rect = self.text.get_rect(center=(self.x_pos, self.y_pos))
-#
-#     def update(self):
-#         SCREEN.blit(self.image, self.rect)
-#         SCREEN.blit(self.text, self.text_rect)
-#
-#     def checkForInput(self, position):
-#         if position[0] in range(self.rect.left, self.rect.right) and position[1] in range(self.rect.top,
-#                                                                                           self.rect.bottom):
-#             print("Button Press!")
-#
-#     def changeColor(self, position):
-#         if position[0] in range(self.rect.left, self.rect.right) and position[1] in range(self.rect.top,
-#                                                                                           self.rect.bottom):
-#             self.text = main_font.render(self.text_input, True, "green")
-#         else:
-#             self.text = main_font.render(self.text_input, True, "white")
+class Button():
+    def __init__(self, image, position, text_input, base_color, hovering_color):
+        self.image = image
+        self.x_pos = position[0]
+        self.y_pos = position[1]
+        #self.ont = font
+        self.base_color, self.hovering_color = base_color, hovering_color
+        self.text_input = text_input
+        self.text = main_font.render(self.text_input, True, self.base_color)
+        if self.image is None:
+            self.image = self.text
+        self.rect = self.image.get_rect(center=(self.x_pos, self.y_pos))
+        self.text_rect = self.text.get_rect(center=(self.x_pos, self.y_pos))
+
+    def update(self):
+        SCREEN.blit(self.image, self.rect)
+        SCREEN.blit(self.text, self.text_rect)
+
+    def checkForInput(self, position):
+        if position[0] in range(self.rect.left, self.rect.right) and position[1] in range(self.rect.top,
+                                                                                          self.rect.bottom):
+            print("Button Press!")
+            return True
+        return False
+
+    def changeColor(self, position):
+        if position[0] in range(self.rect.left, self.rect.right) and position[1] in range(self.rect.top,
+                                                                                          self.rect.bottom):
+            self.text = main_font.render(self.text_input, True, self.hovering_color)
+        else:
+            self.text = main_font.render(self.text_input, True, self.base_color)
 
 
 # life_show
-def lifeShow():
+def lifeShow(life_count, lifeImg):
     for i in range(0, life_count):
         SCREEN.blit(lifeImg[i], (150 + (i * 80), 0))
 
 
 # draw board
-def draw_board(x, y):
+def draw_board(x, y, board_img):
     SCREEN.blit(board_img, (x, y))
 
 
 # draw snake
-def draw_snake(x, y, rX, rY):
+def draw_snake(x, y, rX, rY, snake_img, redSnake_img):
     SCREEN.blit(snake_img, (x, y))
     SCREEN.blit(redSnake_img, (rX, rY))
 
 
-def draw_ladder(x, y):
+def draw_ladder(x, y, ladder_image):
     SCREEN.blit(ladder_image, (x, y))
 
 
 # draw dice
-def draw_dice(diceImg,player_score):
+def draw_dice(diceImg, player_score):
     # print("dice = ", player_score)
     SCREEN.blit(diceImg[player_score - 1], (800, 150))
 
 
-def draw_coin(x, y,coin_img):
+def draw_coin(x, y, coin_img):
     SCREEN.blit(coin_img, (x, y))
 
 
-def coin_Stable(coin_img_X,coin_img_Y):
+def coin_Stable(coin_img_X, coin_img_Y):
     global Final_Coin_X
     Final_Coin_X = coin_img_X
     global Final_Coin_Y
     Final_Coin_Y = coin_img_Y
 
 
-
-
-def gameMenu :
+def gameMenu():
     clock = pygame.time.Clock()
     time_dice_turned = 0
     left_to_right = 1
@@ -287,8 +298,6 @@ def gameMenu :
     coin_img_X = 150 + 30
     coin_img_Y = 50 + 430
 
-
-
     # load dice images
     diceImg = []
     diceImg.append(pygame.image.load('dice1p2.png'))
@@ -310,12 +319,12 @@ def gameMenu :
     while running:
         print(nmbToCo_ladder(12))
         SCREEN.fill((195, 115, 42))
-        draw_board(board_img_X, board_img_Y)
-        draw_snake(snake_img_X, snake_img_Y, redSnake_img_X, redSnake_img_Y)
-        draw_ladder(ladder_image_X, ladder_image_Y)
-        lifeShow()
+        draw_board(board_img_X, board_img_Y, board_img)
+        draw_snake(snake_img_X, snake_img_Y, redSnake_img_X, redSnake_img_Y, snake_img, redSnake_img)
+        draw_ladder(ladder_image_X, ladder_image_Y, ladder_image)
+        lifeShow(life_count, lifeImg)
         if player_position == 1:
-            draw_coin(coin_img_X, coin_img_Y)
+            draw_coin(coin_img_X, coin_img_Y, coin_img)
 
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
@@ -329,7 +338,7 @@ def gameMenu :
                 if event.key == pygame.K_e:
                     odd = 0
 
-        coin_Stable(coin_img_X,coin_img_Y)
+        coin_Stable(coin_img_X, coin_img_Y)
 
         # draw_dice()
         # shap khaile niche namche
@@ -419,13 +428,15 @@ def gameMenu :
                             print("Snake position:", snake_img_X, snake_img_Y)
                             X_Start = snake_img_X - 10
                             Y_Start = snake_img_Y - 25
-                            draw_snake(snake_img_X, snake_img_Y, redSnake_img_X, redSnake_img_Y)
+                            draw_snake(snake_img_X, snake_img_Y, redSnake_img_X, redSnake_img_Y, snake_img,
+                                       redSnake_img)
                         elif (red_snakePosition > snake_position and snake_position - player_score <= 5):
                             red_snakePosition -= player_score
                             (redSnake_img_X, redSnake_img_Y) = nmbToCordinate_green(red_snakePosition)
                             X_redSnake_Start = redSnake_img_X - 10
                             Y_redSnake_Start = redSnake_img_Y - 25
-                            draw_snake(snake_img_X, snake_img_Y, redSnake_img_X, redSnake_img_Y)
+                            draw_snake(snake_img_X, snake_img_Y, redSnake_img_X, redSnake_img_Y, snake_img,
+                                       redSnake_img)
                             print("Red snake nore jao")
                         else:
                             print("moi norbe3")
@@ -435,14 +446,14 @@ def gameMenu :
                                 (ladder_image_X, ladder_image_Y) = nmbToCo_ladder(ladder_head_pos)
                                 X_LadderEnd = ladder_image_X - 25
                                 Y_LadderEnd = ladder_image_Y - 25 + 200
-                                draw_ladder(ladder_image_X, ladder_image_Y)
+                                draw_ladder(ladder_image_X, ladder_image_Y, ladder_image)
 
                             if (ladder_tail_pos < player_position and ladder_head_pos - player_score > 5):
                                 ladder_head_pos -= player_score
                                 (ladder_image_X, ladder_image_Y) = nmbToCo_ladder(ladder_head_pos)
                                 X_LadderEnd = ladder_image_X - 25
                                 Y_LadderEnd = ladder_image_Y - 25 + 200
-                                draw_ladder(ladder_image_X, ladder_image_Y)
+                                draw_ladder(ladder_image_X, ladder_image_Y, ladder_image)
 
                 if (
                         snake_position - player_position <= 6 and snake_position - player_position >= 0 and snake_position - player_score > 5):
@@ -452,7 +463,7 @@ def gameMenu :
                         (redSnake_img_X, redSnake_img_Y) = nmbToCordinate_green(red_snakePosition)
                         X_redSnake_Start = redSnake_img_X - 10
                         Y_redSnake_Start = redSnake_img_Y - 25
-                        draw_snake(snake_img_X, snake_img_Y, redSnake_img_X, redSnake_img_Y)
+                        draw_snake(snake_img_X, snake_img_Y, redSnake_img_X, redSnake_img_Y, snake_img, redSnake_img)
 
                     else:
                         print("Moi norbe")
@@ -462,14 +473,14 @@ def gameMenu :
                             (ladder_image_X, ladder_image_Y) = nmbToCo_ladder(ladder_head_pos)
                             X_LadderEnd = ladder_image_X - 25
                             Y_LadderEnd = ladder_image_Y - 25 + 200
-                            draw_ladder(ladder_image_X, ladder_image_Y)
+                            draw_ladder(ladder_image_X, ladder_image_Y, ladder_image)
 
                         if (ladder_tail_pos < player_position and ladder_head_pos - player_score > 5):
                             ladder_head_pos -= player_score
                             (ladder_image_X, ladder_image_Y) = nmbToCo_ladder(ladder_head_pos)
                             X_LadderEnd = ladder_image_X - 25
                             Y_LadderEnd = ladder_image_Y - 25 + 200
-                            draw_ladder(ladder_image_X, ladder_image_Y)
+                            draw_ladder(ladder_image_X, ladder_image_Y, ladder_image)
 
                 if (
                         snake_position - player_position < 0 and snake_position - player_position > -6 and snake_position - player_score > 5):
@@ -479,7 +490,7 @@ def gameMenu :
                         (redSnake_img_X, redSnake_img_Y) = nmbToCordinate_green(red_snakePosition)
                         X_redSnake_Start = redSnake_img_X - 10
                         Y_redSnake_Start = redSnake_img_Y - 25
-                        draw_snake(snake_img_X, snake_img_Y, redSnake_img_X, redSnake_img_Y)
+                        draw_snake(snake_img_X, snake_img_Y, redSnake_img_X, redSnake_img_Y, snake_img, redSnake_img)
                     else:
                         snake_position += player_score
                         (snake_img_X, snake_img_Y) = nmbToCordinate_green(snake_position)
@@ -495,7 +506,7 @@ def gameMenu :
                         (redSnake_img_X, redSnake_img_Y) = nmbToCordinate_green(red_snakePosition)
                         X_redSnake_Start = redSnake_img_X - 10
                         Y_redSnake_Start = redSnake_img_Y - 25
-                        draw_snake(snake_img_X, snake_img_Y, redSnake_img_X, redSnake_img_Y)
+                        draw_snake(snake_img_X, snake_img_Y, redSnake_img_X, redSnake_img_Y, snake_img, redSnake_img)
                     else:
                         print("moi norbe 2")
                         if (
@@ -504,14 +515,14 @@ def gameMenu :
                             (ladder_image_X, ladder_image_Y) = nmbToCo_ladder(ladder_head_pos)
                             X_LadderEnd = ladder_image_X - 25
                             Y_LadderEnd = ladder_image_Y - 25 + 200
-                            draw_ladder(ladder_image_X, ladder_image_Y)
+                            draw_ladder(ladder_image_X, ladder_image_Y, ladder_image)
 
                         if ladder_tail_pos < player_position and ladder_head_pos - player_score > 5:
                             ladder_head_pos -= player_score
                             (ladder_image_X, ladder_image_Y) = nmbToCo_ladder(ladder_head_pos)
                             X_LadderEnd = ladder_image_X - 25
                             Y_LadderEnd = ladder_image_Y - 25 + 200
-                            draw_ladder(ladder_image_X, ladder_image_Y)
+                            draw_ladder(ladder_image_X, ladder_image_Y, ladder_image)
 
                 dice_checking = 0
 
@@ -530,9 +541,9 @@ def gameMenu :
                 # time_dice_turned = 0
                 destination = player_score + player_position
 
-            draw_dice(diceImg,player_score)
-            draw_coin(coin_img_X, coin_img_Y,coin_img)
-            coin_Stable()
+            draw_dice(diceImg, player_score)
+            draw_coin(coin_img_X, coin_img_Y, coin_img)
+            coin_Stable(coin_img_X, coin_img_Y)
 
             if life_count == 0:
                 print("End Game")
@@ -540,3 +551,44 @@ def gameMenu :
         clock.tick(60)
         time.sleep(.05)
         pygame.display.update()
+
+
+def main_menu():
+    while True:
+        SCREEN.blit(BG, (0, 0))
+
+        MENU_MOUSE_POS = pygame.mouse.get_pos()
+
+        # MENU_TEXT = get_font(100).render("MAIN MENU", True, "#b68f40")
+        # MENU_RECT = MENU_TEXT.get_rect(center=(640, 100))
+
+        PLAY_BUTTON = Button(image=pygame.image.load("start.png"), position=(640, 250),
+                             text_input="PLAY", base_color="#d7fcd4", hovering_color="Green")
+        OPTIONS_BUTTON = Button(image=pygame.image.load("start.png"), position=(640, 400),
+                                text_input="OPTIONS",base_color="#d7fcd4", hovering_color="Green")
+        QUIT_BUTTON = Button(image=pygame.image.load("start.png"), position=(640, 550),
+                             text_input="QUIT", base_color="#d7fcd4", hovering_color="Green")
+
+        # SCREEN.blit(MENU_TEXT, MENU_RECT)
+
+        for button in [PLAY_BUTTON, OPTIONS_BUTTON, QUIT_BUTTON]:
+            button.changeColor(MENU_MOUSE_POS)
+            button.update()
+
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                pygame.quit()
+                sys.exit()
+            if event.type == pygame.MOUSEBUTTONDOWN:
+                if PLAY_BUTTON.checkForInput(MENU_MOUSE_POS):
+                    gameMenu()
+                # if OPTIONS_BUTTON.checkForInput(MENU_MOUSE_POS):
+                #     options()
+                if QUIT_BUTTON.checkForInput(MENU_MOUSE_POS):
+                    pygame.quit()
+                    sys.exit()
+
+        pygame.display.update()
+
+
+main_menu()
