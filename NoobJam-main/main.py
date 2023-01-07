@@ -11,7 +11,7 @@ SCREEN = pygame.display.set_mode((1000, 600))
 
 Final_Coin_Y = 0
 Final_Coin_X = 0
-
+crossFlux = True
 main_font = pygame.font.SysFont("cambria", 30)
 BG = pygame.image.load("Background.png")
 BG = pygame.transform.scale(BG, (1000, 600))
@@ -242,6 +242,68 @@ def coin_Stable(coin_img_X, coin_img_Y):
     Final_Coin_Y = coin_img_Y
 
 
+def gameOver():
+    textFont = pygame.font.SysFont("cambria", 30)
+    global crossFlux
+    while True:
+
+        SCREEN.fill("black")
+        Back_Button = Button(image=pygame.image.load("start.png"), position=(640, 250),
+                             text_input="PLAY Again", base_color="#d7fcd4", hovering_color="Green")
+        Back_Button.changeColor(pygame.mouse.get_pos())
+        Back_Button.update()
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                pygame.quit()
+                crossFlux = False
+                sys.exit()
+            if event.type == pygame.MOUSEBUTTONDOWN:
+                if Back_Button.checkForInput(pygame.mouse.get_pos()):
+                    gameMenu()
+        if not crossFlux:
+            pygame.quit()
+            sys.exit()
+        gameOverText = textFont.render("Game Over", True, (255, 255, 255))
+        SCREEN.blit(gameOverText, (400, 250))
+        pygame.display.update()
+
+
+def youWin():
+    textFont = pygame.font.SysFont("cambria", 30)
+    global crossFlux
+    while True:
+
+        SCREEN.fill("black")
+        Back_Button = Button(image=pygame.image.load("start.png"), position=(640, 250),
+                             text_input="PLAY Again", base_color="#d7fcd4", hovering_color="Green")
+        Back_Button.changeColor(pygame.mouse.get_pos())
+        Back_Button.update()
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                pygame.quit()
+                crossFlux=False
+                sys.exit()
+            if event.type == pygame.MOUSEBUTTONDOWN:
+                if Back_Button.checkForInput(pygame.mouse.get_pos()):
+                    gameMenu()
+        if not crossFlux:
+            pygame.quit()
+            sys.exit()
+
+        gameOverText = textFont.render("You won", True, (255, 255, 255))
+        SCREEN.blit(gameOverText, (400, 250))
+        pygame.display.update()
+
+
+def diceRolling(position, rect):
+    if position[0] in range(rect.left, rect.right) and position[1] in range(rect.top,
+                                                                            rect.bottom):
+        if pygame.mouse.get_pressed()[0] == 1:
+            print("Button Press!")
+            return True
+    return False
+
+
 def gameMenu():
     clock = pygame.time.Clock()
     time_dice_turned = 0
@@ -316,18 +378,10 @@ def gameMenu():
     lifeImg.append(pygame.image.load("life.png"))
     lifeImg.append(pygame.image.load("life.png"))
     lifeImg.append(pygame.image.load("life.png"))
-    global Final_Coin_Y
+    global Final_Coin_Y, crossFlux
     Final_Coin_Y = coin_img_Y
 
     # gameoverFlag = False
-
-    def diceRolling(position, rect):
-        if position[0] in range(rect.left, rect.right) and position[1] in range(rect.top,
-                                                                                rect.bottom):
-            if pygame.mouse.get_pressed()[0] == 1:
-                print("Button Press!")
-                return True
-        return False
 
     while running:
         SCREEN.fill("black")
@@ -339,9 +393,11 @@ def gameMenu():
         lifeShow(life_count, lifeImg)
         if player_position == 1:
             draw_coin(coin_img_X, coin_img_Y, coin_img)
-
+        if crossFlux == False:
+            running = False
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
+                crossFlux = False
                 running = False
             elif event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_SPACE:
@@ -356,6 +412,10 @@ def gameMenu():
 
         # draw_dice()
         # shap khaile niche namche
+        if life_count == 0:
+            gameOver()
+        if player_position >= 25:
+            youWin()
         if odd == 1:
             if eating:
                 life_count -= 1
@@ -572,7 +632,7 @@ def gameMenu():
 def howToPlay():
     font = pygame.font.SysFont("monospace", 30)
     lines = ["Line 1", "Line 2", "Line 3"]
-
+    global crossFlux
     # Set the vertical spacing between lines
     line_spacing = 5
 
@@ -598,6 +658,7 @@ def howToPlay():
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 pygame.quit()
+                crossFlux = False
                 sys.exit()
             if event.type == pygame.MOUSEBUTTONDOWN:
                 if Back_Button.checkForInput(MENU_MOUSE_POS):
